@@ -1,6 +1,6 @@
 import {getContent} from './content';
 import getLocaleContext from './context';
-import {saveFile} from './helpers';
+import {saveFile, displayDialog} from './helpers';
 
 export const saveLocaleToFile = (localeContext, textLayersContent) => saveFile(
     `${localeContext['folder_path']}${localeContext['current_locale']}.json`,
@@ -35,10 +35,8 @@ function getNewLocaleByUser() {
 
 // save locales
 export default function saveLocale(context) {
-
     const document = context.document;
     const localeContext = getLocaleContext(context);
-
     if (localeContext['folder_path']) {
         if (!localeContext['current_locale']) {
             const newLocaleByUser = getNewLocaleByUser();
@@ -46,11 +44,13 @@ export default function saveLocale(context) {
             if (newLocaleByUser) {
                 localeContext['current_locale'] = newLocaleByUser;
                 saveConfigFile(localeContext);
+                context.document.showMessage("ddsfasd");
             }
         }
+
         if (localeContext['current_locale']) {
             const textLayersContent = getContent(document.pages());
-
+            context.document.showMessage("ddsf");
 
             if (saveLocaleToFile(localeContext, textLayersContent)) {
                 context.document.showMessage("'" + localeContext['current_locale'] + "' locale saved.")

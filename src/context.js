@@ -3,13 +3,12 @@ import {FileManager, displayDialog, readFile} from './helpers';
 export default function getLocaleContext(context) {
 
     const document = context.document;
+    const localeContext = {};
 
-    const localeContext = {
-        'folder_path': null,
-        'config_file_path': null,
-        'locales': null,
-        'current_locale': null,
-    };
+    localeContext['folder_path'] = null;
+    localeContext['config_file_path'] = null;
+    localeContext['locales'] = [];
+    localeContext['current_locale'] = null;
 
     // Check if document is saved
     if (document.fileURL() === null) {
@@ -59,18 +58,13 @@ export default function getLocaleContext(context) {
         const dirContents = fileManager.dir(translationsFolderPath);
 
 
-        for (let i = 0; i < dirContents.count(); i++) {
-
-            if (!dirContents[i].includes(".json")) {
-                continue
-            }
-
-            const locale = dirContents[i].replace('.json', '');
-            localeContext['locales'].push(locale);
-
-            if (String(configFileContent) === String(locale)) {
-                localeContext['current_locale'] = locale;
-            }
+        for(let i = 0; i < dirContents.count(); i++){
+               if(dirContents[i].includes(".json")) {
+                   const locale = dirContents[i].replace('.json','')
+                   localeContext['locales'].push(locale)
+                   if(String(configFileContent) === String(locale))
+                       localeContext['current_locale'] = locale
+               }
         }
     }
     return localeContext
