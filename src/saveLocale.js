@@ -42,6 +42,7 @@ export default function saveLocale(context) {
     if (localeContext['folder_path']) {
         if (!localeContext['current_locale']) {
             const newLocaleByUser = getNewLocaleByUser();
+
             if (newLocaleByUser) {
                 localeContext['current_locale'] = newLocaleByUser;
                 saveConfigFile(localeContext);
@@ -49,6 +50,8 @@ export default function saveLocale(context) {
         }
         if (localeContext['current_locale']) {
             const textLayersContent = getContent(document.pages());
+            
+
             if (saveLocaleToFile(localeContext, textLayersContent)) {
                 context.document.showMessage("'" + localeContext['current_locale'] + "' locale saved.")
             }

@@ -1,9 +1,11 @@
+import {displayDialog} from './utils';
+
 const processOverrides = function (override, possibleTextfields) {
     const returnValue = {};
     const overrideKeys = Object.keys(override);
     const overrideKeysLength = overrideKeys.length;
 
-    for (let i = 0; i <  overrideKeysLength; i++) {
+    for (let i = 0; i < overrideKeysLength; i++) {
         const key = overrideKeys[i];
         let value = override[key];
         if ((value.class() + "").indexOf("String") !== -1) {
@@ -29,8 +31,8 @@ const parseArtboard = function (artboard, symbolTextLayer) {
 
     // get all contents
     const layers = artboard.children();
-
-    for (const layer of artboard.children()) {
+    for (var i = 0; i < layers.length; i++) {
+        const layer = layers[i];
         let value;
         switch (layer.class()) {
 
@@ -53,14 +55,17 @@ const parseArtboard = function (artboard, symbolTextLayer) {
 
 
 export const getContent = function (pages) {
+
+    let page;
     const contents = [];
 
     const symbolTextLayer = {};
-
     // prepare symbol string for override
-    for (const page of pages) {
+    for (let i = 0; i < pages.count(); i++) {
+        page = pages[i];
         const layers = page.children();
-        for (const layer of layers) {
+        for (let j = 0; j < layers.length; j++) {
+            const layer = layers[j];
             if (layer.class() === MSTextLayer) {
                 const key_string = decodeURI(layer.objectID());
                 symbolTextLayer[key_string] = true
@@ -70,8 +75,8 @@ export const getContent = function (pages) {
 
     // check all nodes
 
-    for (const page of pages) {
-
+    for (let i = 0; i < pages.length; i++) {
+        page = pages[i];
         // page content
         const content = {
             name: String(page.name()),
@@ -82,14 +87,17 @@ export const getContent = function (pages) {
         const artboards = page.artboards();
 
         // get artboards content;
-        for (const artboard of artboard) {
-            const artboardContent = parseArtboard(artboards[i], symbolTextLayer);
+        for (let j = 0; j < artboards.length; j++) {
+            const artboard = artboards[j];
+            const artboardContent = parseArtboard(artboard, symbolTextLayer);
             if (Object.getOwnPropertyNames(artboardContent.texts).length > 0) {
                 content.artboards.push(artboardContent);
             }
 
         }
-        contents.push(parsePage(pages[i], symbolTextLayer));
+        contents.push(content);
     }
+    displayDialog("second", 's')
+
     return contents;
 };

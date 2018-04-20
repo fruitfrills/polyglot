@@ -49,7 +49,7 @@ export default function getLocaleContext(context) {
         localeContext['config_file_path'] = `${translationsFolderPath}.config`;
 
         if (!fileManager.exist(localeContext['config_file_path'])) {
-            return localeContext
+            return localeContext;
         }
 
         const configFileContent = readFile(localeContext['config_file_path']);
@@ -57,13 +57,14 @@ export default function getLocaleContext(context) {
         // Check translations folder files
         const dirContents = fileManager.dir(translationsFolderPath);
 
-        for (const content of dirContents) {
-            if (content.includes('.json')) {
-                const locale = content.replace('.json', '');
-                if (String(configFileContent) === String(locale)) {
-                    localeContext['current_locale'] = locale;
-                }
-            }
+
+        for(let i = 0; i < dirContents.count(); i++){
+               if(dirContents[i].includes(".json")) {
+                   const locale = dirContents[i].replace('.json','')
+                   localeContext['locales'].push(locale)
+                   if(String(configFileContent) === String(locale))
+                       localeContext['current_locale'] = locale
+               }
         }
     }
     return localeContext
