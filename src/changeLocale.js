@@ -2,6 +2,7 @@ import saveLocale, {saveConfigFile, saveLocaleToFile} from './saveLocale';
 import getLocaleContext from './context';
 import {getContent} from './content';
 
+
 // override symbols
 function fillOverride(defaultValue, override) {
     const newOverride = defaultValue || NSMutableDictionary.dictionary();
@@ -44,7 +45,6 @@ function localeIsAvailable(localeContext,selected_locale) {
 function updateTextsLayersFromLocale(context,localeContext,selected_locale) {
 
     const document = context.document;
-
     if (!localeIsAvailable(localeContext,selected_locale) ) {
       return false;
     }
