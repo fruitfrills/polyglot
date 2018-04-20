@@ -4,15 +4,19 @@
   "icon": "icon.png",
   "commands": [
     {
-      "name": "my-command",
-      "identifier": "my-command-identifier",
-      "script": "./my-command.js"
+      "name": "Change Locale",
+      "identifier": "changeLocale",
+      "script": "./changeLocale.js"
+    }, {
+      "name": "Save Locale",
+      "identifier": "saveLocale",
+      "script": "./saveLocale.js"
     }
   ],
   "menu": {
     "title": "polyglot",
     "items": [
-      "my-command-identifier"
+      "changeLocale", "saveLocale"
     ]
   }
 }
