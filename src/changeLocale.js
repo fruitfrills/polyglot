@@ -2,16 +2,16 @@ import saveLocale, {saveConfigFile, saveLocaleToFile} from './saveLocale';
 import getLocaleContext from './context';
 import {getContent} from './content';
 
-
+// override symbols
 function fillOverride(defaultValue, override) {
     const newOverride = defaultValue || NSMutableDictionary.dictionary();
     const newMutableOverrides = NSMutableDictionary.dictionaryWithDictionary(newOverride);
+    const overrideKeys = Object.keys(override);
+    const overrideKeysLength = overrideKeys.length;
 
-    var overrideKeys = Object.keys(override);
-    var overrideKeysLength = overrideKeys.length;
-    for (var i = 0; i <  overrideKeysLength; i++) {
-       var key = overrideKeys[i];
-       var value = override[key];
+    for (let i = 0; i <  overrideKeysLength; i++) {
+       const key = overrideKeys[i];
+       const value = override[key];
        if (typeof value === "string") {
            newMutableOverrides.setObject_forKey(value, key);
        } else {
@@ -19,29 +19,31 @@ function fillOverride(defaultValue, override) {
            newMutableOverrides.setObject_forKey(fillOverride(subdictionary, value), key);
        }
     }
+
     return newMutableOverrides
 }
 
+// get current locale file
 function getLocaleTextFromFile(localeContext, locale) {
-    var file = localeContext['folder_path']+locale+'.json';
-    var fileContent = NSString.stringWithContentsOfFile_encoding_error(file, NSUTF8StringEncoding, null);
-    var arrayContent = JSON.parse(fileContent, undefined, 2);
-    return arrayContent;
+    const fileName = `${localeContext['folder_path']}${locale}.json`;
+    const fileContent = NSString.stringWithContentsOfFile_encoding_error(fileName, NSUTF8StringEncoding, null);
+    return JSON.parse(fileContent);
 }
 
+// check locales
 function localeIsAvailable(localeContext,selected_locale) {
-    for (var i = 0; i < localeContext['locales'].length; i++) {
-        if(String(localeContext['locales'][i]) === String(selected_locale));
+    for (const locale of localeContext['locales']) {
+        if (String(locale) === String(selected_locale)) {
             return true;
+        }
     }
     return false;
 }
 
-
+// update text layer
 function updateTextsLayersFromLocale(context,localeContext,selected_locale) {
 
-    var document = context.document;
-
+    const document = context.document;
 
     if (!localeIsAvailable(localeContext,selected_locale) ) {
       return false;
@@ -67,24 +69,17 @@ function updateTextsLayersFromLocale(context,localeContext,selected_locale) {
             for (var j = 0; j < layers.length; j++) {
                 switch (layers[j].class()) {
                   case MSTextLayer:
-                    var key_string = unescape(layers[j].objectID());
-                    var value_string = unescape(layers[j].stringValue());
+                    var key_string = decodeURI(layers[j].objectID());
+                    var value_string = decodeURI(layers[j].stringValue());
                     if (localeText[key_string]) {
                       layers[j].setStringValue(localeText[key_string])
                     }
                       break;
                   case MSSymbolInstance:
-
-                      var key_string = unescape(layers[j].objectID());
-                      var value = localeText[key_string];
-                        if (key_string  === '47D63924-B3D0-46AB-9AB1-429FE85A5CDC') {
-                          context.document.showMessage(unescape(layers[j].objectID()));
-                          throw new Error("test");
-                        }
-
+                      const key_string = decodeURI(layers[j].objectID());
+                      const value = localeText[key_string];
                         if (value) {
-
-                          var overrides = fillOverride(layers[j].overrides(), value)
+                          const overrides = fillOverride(layers[j].overrides(), value);
                           if (overrides && Object.keys(overrides).length > 0) {
                               layers[j].overrides = overrides;
                           }
