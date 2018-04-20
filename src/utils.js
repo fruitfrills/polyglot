@@ -27,3 +27,8 @@ export const displayDialog = (text, title) => {
 };
 
 export const readFile = (path) => NSString.stringWithContentsOfFile_encoding_error(path, NSUTF8StringEncoding, null);
+
+export const saveFile = (path, content) => Boolean(
+    NSString.stringWithFormat(content)
+    .writeToFile_atomically_encoding_error(path, true, NSUTF8StringEncoding, null)
+);

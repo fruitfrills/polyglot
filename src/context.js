@@ -49,7 +49,7 @@ export default function getLocaleContext(context) {
         localeContext['config_file_path'] = `${translationsFolderPath}.config`;
 
         if (!fileManager.exist(localeContext['config_file_path'])) {
-            return
+            return localeContext
         }
 
         const configFileContent = readFile(localeContext['config_file_path']);
