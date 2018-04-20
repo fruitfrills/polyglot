@@ -1,5 +1,4 @@
-import {displayDialog} from './utils';
-
+// override symbols
 const processOverrides = function (override, possibleTextfields) {
     const returnValue = {};
     const overrideKeys = Object.keys(override);
@@ -31,7 +30,7 @@ const parseArtboard = function (artboard, symbolTextLayer) {
 
     // get all contents
     const layers = artboard.children();
-    for (var i = 0; i < layers.length; i++) {
+    for (let i = 0; i < layers.length; i++) {
         const layer = layers[i];
         let value;
         switch (layer.class()) {
@@ -39,13 +38,13 @@ const parseArtboard = function (artboard, symbolTextLayer) {
             case MSTextLayer:
                 value = decodeURI(layer.stringValue());
                 if (String(value) !== "") {
-                  content.texts[decodeURI(layer.objectID())] = value;
+                    content.texts[decodeURI(layer.objectID())] = value;
                 }
                 break;
             case MSSymbolInstance:
                 value = processOverrides(layer.overrides(), symbolTextLayer);
                 if (Object.getOwnPropertyNames(value).length > 0) {
-                  content.texts[decodeURI(layer.objectID())] = value;
+                    content.texts[decodeURI(layer.objectID())] = value;
                 }
                 break
         }
@@ -53,7 +52,7 @@ const parseArtboard = function (artboard, symbolTextLayer) {
     return content;
 };
 
-
+// getting content from all pages and artboards;
 export const getContent = function (pages) {
 
     let page;
@@ -97,7 +96,5 @@ export const getContent = function (pages) {
         }
         contents.push(content);
     }
-    displayDialog("second", 's')
-
     return contents;
 };

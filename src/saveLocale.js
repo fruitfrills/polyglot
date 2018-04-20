@@ -1,10 +1,10 @@
 import {getContent} from './content';
 import getLocaleContext from './context';
-import {saveFile} from './utils';
+import {saveFile} from './helpers';
 
 export const saveLocaleToFile = (localeContext, textLayersContent) => saveFile(
     `${localeContext['folder_path']}${localeContext['current_locale']}.json`,
-    JSON.stringify(textLayersContent)
+    JSON.stringify(textLayersContent, undefined, 2)
 );
 
 
@@ -50,7 +50,7 @@ export default function saveLocale(context) {
         }
         if (localeContext['current_locale']) {
             const textLayersContent = getContent(document.pages());
-            
+
 
             if (saveLocaleToFile(localeContext, textLayersContent)) {
                 context.document.showMessage("'" + localeContext['current_locale'] + "' locale saved.")
