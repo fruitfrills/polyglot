@@ -26,7 +26,6 @@ export function getNewLocaleByUser() {
 export default function saveLocale(context) {
     const document = context.document;
     const polyglot = new Polyglot(context);
-
     if (polyglot.folder_path) {
         if (!polyglot.current_locale) {
             const newLocaleByUser = getNewLocaleByUser();
@@ -38,9 +37,8 @@ export default function saveLocale(context) {
         }
 
         if (polyglot.current_locale) {
-            const textLayersContent = getContent(document.pages());
-
-            if (polyglot.saveLocaleToFile(textLayersContent)) {
+            const content = getContent(document.pages());
+            if (polyglot.saveLocaleToFile(content)) {
                 context.document.showMessage(`'${polyglot.current_locale}' locale saved.`)
             }
         }

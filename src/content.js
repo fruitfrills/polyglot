@@ -41,6 +41,7 @@ function fillOverride(defaultValue, override) {
 
     return newMutableOverrides
 }
+import {displayDialog} from './helpers';
 
 const parseArtboard = function (artboard, symbolTextLayer) {
 
@@ -53,6 +54,9 @@ const parseArtboard = function (artboard, symbolTextLayer) {
     const layers = artboard.children();
     for (let i = 0; i < layers.length; i++) {
         const layer = layers[i];
+        try {
+
+
         let value;
         switch (layer.class()) {
 
@@ -69,10 +73,12 @@ const parseArtboard = function (artboard, symbolTextLayer) {
                 }
                 break
         }
+      } catch (err) {
+        displayDialog(`Catch error at '${artboard.name()}'. ${err.message}`, `Error`)
+      }
     }
     return content;
 };
-
 // getting content from all pages and artboards;
 export const getContent = function (pages) {
 
@@ -92,7 +98,6 @@ export const getContent = function (pages) {
             }
         }
     }
-
     // check all nodes
 
     for (let i = 0; i < pages.length; i++) {
@@ -105,7 +110,6 @@ export const getContent = function (pages) {
 
         // get artboard
         const artboards = page.artboards();
-
         // get artboards content;
         for (let j = 0; j < artboards.length; j++) {
             const artboard = artboards[j];

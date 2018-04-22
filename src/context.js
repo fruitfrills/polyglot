@@ -42,7 +42,6 @@ export default class Polyglot {
             }
 
         }
-
         // Check translations folder
         if (fileManager.exist(translationsFolderPath)) {
             this.folder_path = translationsFolderPath;
@@ -51,7 +50,7 @@ export default class Polyglot {
             this.config_file_path = `${translationsFolderPath}.config`;
 
             if (!fileManager.exist(this.config_file_path)) {
-                return localeContext;
+                return;
             }
 
             const configFileContent = readFile(this.config_file_path);
