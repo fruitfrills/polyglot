@@ -5,6 +5,10 @@ Manage texts in Sketch in multiple locales.
 
 _This plugin was created using `skpm` and based on [text translate](https://github.com/laresgoiti/texts_translate/blob/master/README.md)._
 
+## Install
+
+[Download](https://github.com/fruitfrills/polyglot/releases/download/v0.2.0/plugin.sketchplugin.zip`)
+
 ## Usage
 
 Go to Plugins -> Texts Translation -> Save locale to save current locale.
