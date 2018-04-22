@@ -1,16 +1,5 @@
 import {getContent} from './content';
-import getLocaleContext from './context';
-import {saveFile, displayDialog} from './helpers';
-
-export const saveLocaleToFile = (localeContext, textLayersContent) => saveFile(
-    `${localeContext['folder_path']}${localeContext['current_locale']}.json`,
-    JSON.stringify(textLayersContent, undefined, 2)
-);
-
-
-export const saveConfigFile = (localeContext) => saveFile(
-    localeContext['config_file_path'], localeContext['current_locale']
-);
+import Polyglot from './context';
 
 // create new locale
 function getNewLocaleByUser() {
@@ -36,24 +25,23 @@ function getNewLocaleByUser() {
 // save locales
 export default function saveLocale(context) {
     const document = context.document;
-    const localeContext = getLocaleContext(context);
-    if (localeContext['folder_path']) {
-        if (!localeContext['current_locale']) {
+    const polyglot = new Polyglot(context);
+
+    if (polyglot.folder_path) {
+        if (!polyglot.current_locale) {
             const newLocaleByUser = getNewLocaleByUser();
 
             if (newLocaleByUser) {
-                localeContext['current_locale'] = newLocaleByUser;
-                saveConfigFile(localeContext);
-                context.document.showMessage("ddsfasd");
+                polyglot.current_locale = newLocaleByUser;
+                polyglot.saveConfigFile();
             }
         }
 
-        if (localeContext['current_locale']) {
+        if (polyglot.current_locale) {
             const textLayersContent = getContent(document.pages());
-            context.document.showMessage("ddsf");
 
-            if (saveLocaleToFile(localeContext, textLayersContent)) {
-                context.document.showMessage("'" + localeContext['current_locale'] + "' locale saved.")
+            if (polyglot.saveLocaleToFile(textLayersContent)) {
+                context.document.showMessage(`'${polyglot.current_locale}' locale saved.`)
             }
         }
     }

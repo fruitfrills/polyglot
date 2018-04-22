@@ -1,114 +1,19 @@
 import saveLocale, {saveConfigFile, saveLocaleToFile} from './saveLocale';
-import getLocaleContext from './context';
-import {getContent} from './content';
+import Polyglot from './context';
+import {getContent, setContent} from './content';
 
-
-// override symbols
-function fillOverride(defaultValue, override) {
-    const newOverride = defaultValue || NSMutableDictionary.dictionary();
-    const newMutableOverrides = NSMutableDictionary.dictionaryWithDictionary(newOverride);
-    const overrideKeys = Object.keys(override);
-    const overrideKeysLength = overrideKeys.length;
-
-    for (let i = 0; i < overrideKeysLength; i++) {
-        const key = overrideKeys[i];
-        const value = override[key];
-        if (typeof value === "string") {
-            newMutableOverrides.setObject_forKey(value, key);
-        } else {
-            const subdictionary = newMutableOverrides.objectForKey(key);
-            newMutableOverrides.setObject_forKey(fillOverride(subdictionary, value), key);
-        }
-    }
-
-    return newMutableOverrides
-}
-
-// get current locale file
-function getLocaleTextFromFile(localeContext, locale) {
-    const fileName = `${localeContext['folder_path']}${locale}.json`;
-    const fileContent = NSString.stringWithContentsOfFile_encoding_error(fileName, NSUTF8StringEncoding, null);
-    return JSON.parse(fileContent);
-}
-
-// check locales
-function localeIsAvailable(localeContext, selected_locale) {
-    for (const locale of localeContext['locales']) {
-        if (String(locale) === String(selected_locale)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-// update text layer
-function updateTextsLayersFromLocale(context, localeContext, selected_locale) {
-
-    const document = context.document;
-    if (!localeIsAvailable(localeContext, selected_locale)) {
-        return false;
-    }
-    const _localeContext = getLocaleTextFromFile(localeContext, selected_locale);
-    const localeText = {};
-
-    for (let i = 0; i < _localeContext.length; i++) {
-        for (let j = 0; j < _localeContext[i].artboards.length; j++) {
-            for (let id in _localeContext[i].artboards[j].texts) {
-                localeText[id] = _localeContext[i].artboards[j].texts[id];
-            }
-        }
-    }
-    const pages = document.pages();
-
-    for (let i = 0; i < pages.length; i++) {
-        const artboards = pages[i].artboards();
-
-        for (let a = 0; a < artboards.length; a++) {
-
-            const layers = artboards[a].children();
-
-            for (let j = 0; j < layers.length; j++) {
-                let key_string;
-                switch (layers[j].class()) {
-                    case MSTextLayer:
-                        key_string = decodeURI(layers[j].objectID());
-                        if (localeText[key_string]) {
-                            layers[j].setStringValue(localeText[key_string])
-                        }
-                        break;
-                    case MSSymbolInstance:
-                        key_string = decodeURI(layers[j].objectID());
-                        const value = localeText[key_string];
-                        if (value) {
-                            const overrides = fillOverride(layers[j].overrides(), value);
-                            if (overrides && Object.keys(overrides).length > 0) {
-                                layers[j].overrides = overrides;
-                            }
-                        }
-                        break;
-                    default:
-                }
-            }
-        }
-    }
-
-    localeContext['current_locale'] = selected_locale;
-    saveConfigFile(localeContext);
-    return true
-}
 
 export default function changeLocale(context) {
 
-    const localeContext = getLocaleContext(context);
+    const polyglot = new Polyglot(context);
 
-    if (!localeContext['folder_path']) {
+    if (!polyglot.folder_path) {
         return
     }
 
     const window = NSWindow.alloc().init();
     window.setTitle("Change locale");
     window.setFrame_display(NSMakeRect(0, 0, 600, 170), false);
-
 
     const promptField = NSTextField.alloc().initWithFrame(NSMakeRect(0, 0, 0, 0));
     promptField.setEditable(false);
@@ -120,11 +25,11 @@ export default function changeLocale(context) {
     window.contentView().addSubview(promptField);
 
     const inputField = NSComboBox.alloc().initWithFrame(NSMakeRect(promptField.frame().size.width + 30, 95, 180, 25));
-    inputField.addItemsWithObjectValues(localeContext['locales']);
+    inputField.addItemsWithObjectValues(polyglot.locales);
     inputField.setEditable(false);
     window.contentView().addSubview(inputField);
-    if (localeContext['current_locale']) {
-        inputField.selectItemWithObjectValue(localeContext['current_locale'])
+    if (polyglot.current_locale) {
+        inputField.selectItemWithObjectValue(polyglot.current_locale)
     }
 
     const okButton = NSButton.alloc().initWithFrame(NSMakeRect(0, 0, 0, 0));
@@ -133,9 +38,9 @@ export default function changeLocale(context) {
     okButton.sizeToFit();
     okButton.setFrame(NSMakeRect(window.frame().size.width - okButton.frame().size.width - 20, 14, okButton.frame().size.width, okButton.frame().size.height));
     okButton.setKeyEquivalent("\r"); // return key
-    okButton.setCOSJSTargetFunction(function (sender) {
-        if (updateTextsLayersFromLocale(context, localeContext, inputField.stringValue())) {
-            context.document.showMessage("Changed to locale '" + localeContext['current_locale'] + "'.");
+    okButton.setCOSJSTargetFunction((sender) => {
+        if (setContent(context.document.pages(), polyglot, inputField.stringValue())) {
+            context.document.showMessage( `Changed to locale  '${polyglot.current_locale}'.`);
             window.orderOut(undefined);
             NSApp.stopModal();
         } else {
@@ -165,11 +70,11 @@ export default function changeLocale(context) {
     newLocaleButton.setCOSJSTargetFunction((sender) => {
         const newLocaleName = getNewLocaleByUser();
         if (newLocaleName) {
-            localeContext['current_locale'] = newLocaleName;
-            saveConfigFile(localeContext);
+            polyglot.current_locale = newLocaleName;
+            polyglot.saveConfigFile();
             const textLayersContent = getContent(context);
-            if (saveLocaleToFile(localeContext, textLayersContent)) {
-                context.document.showMessage("'" + localeContext['current_locale'] + "' locale created.");
+            if (polyglot.saveLocaleToFile(textLayersContent)) {
+                context.document.showMessage(`'${polyglot.current_locale}'  locale created.`);
                 window.orderOut(undefined);
                 NSApp.stopModal();
             }
@@ -178,8 +83,8 @@ export default function changeLocale(context) {
     window.contentView().addSubview(newLocaleButton);
     const saveLocaleButton = NSButton.alloc().initWithFrame(NSMakeRect(0, 0, 0, 0));
     let saveLocaleButtonTitle = '  Save current locale  ';
-    if (localeContext['current_locale']) {
-        saveLocaleButtonTitle = "  Save current locale '" + localeContext['current_locale'] + "'  ";
+    if (polyglot.current_locale) {
+        saveLocaleButtonTitle = `  Save current locale '${polyglot.current_locale}'  `;
     }
     saveLocaleButton.setTitle(saveLocaleButtonTitle);
     saveLocaleButton.setBezelStyle(NSRoundedBezelStyle);
@@ -188,5 +93,4 @@ export default function changeLocale(context) {
     saveLocaleButton.setCOSJSTargetFunction((sender) => saveLocale(context));
     window.contentView().addSubview(saveLocaleButton);
     NSApp.runModalForWindow(window);
-
 }

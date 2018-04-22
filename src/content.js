@@ -21,6 +21,27 @@ const processOverrides = function (override, possibleTextfields) {
     return returnValue
 };
 
+// override symbols
+function fillOverride(defaultValue, override) {
+    const newOverride = defaultValue || NSMutableDictionary.dictionary();
+    const newMutableOverrides = NSMutableDictionary.dictionaryWithDictionary(newOverride);
+    const overrideKeys = Object.keys(override);
+    const overrideKeysLength = overrideKeys.length;
+
+    for (let i = 0; i < overrideKeysLength; i++) {
+        const key = overrideKeys[i];
+        const value = override[key];
+        if (typeof value === "string") {
+            newMutableOverrides.setObject_forKey(value, key);
+        } else {
+            const subdictionary = newMutableOverrides.objectForKey(key);
+            newMutableOverrides.setObject_forKey(fillOverride(subdictionary, value), key);
+        }
+    }
+
+    return newMutableOverrides
+}
+
 const parseArtboard = function (artboard, symbolTextLayer) {
 
     const content = {
@@ -98,3 +119,56 @@ export const getContent = function (pages) {
     }
     return contents;
 };
+
+export const setContent = (pages, polyglot, selected_locale) => {
+
+    if (!polyglot.localeIsAvailable(selected_locale)) {
+        return false;
+    }
+    const _localeContext = polyglot.getLocaleTextFromFile(selected_locale);
+    const localeText = {};
+
+    for (let i = 0; i < _localeContext.length; i++) {
+        for (let j = 0; j < _localeContext[i].artboards.length; j++) {
+            for (let id in _localeContext[i].artboards[j].texts) {
+                localeText[id] = _localeContext[i].artboards[j].texts[id];
+            }
+        }
+    }
+
+    for (let i = 0; i < pages.length; i++) {
+        const artboards = pages[i].artboards();
+
+        for (let a = 0; a < artboards.length; a++) {
+
+            const layers = artboards[a].children();
+
+            for (let j = 0; j < layers.length; j++) {
+                let key_string;
+                switch (layers[j].class()) {
+                    case MSTextLayer:
+                        key_string = decodeURI(layers[j].objectID());
+                        if (localeText[key_string]) {
+                            layers[j].setStringValue(localeText[key_string])
+                        }
+                        break;
+                    case MSSymbolInstance:
+                        key_string = decodeURI(layers[j].objectID());
+                        const value = localeText[key_string];
+                        if (value) {
+                            const overrides = fillOverride(layers[j].overrides(), value);
+                            if (overrides && Object.keys(overrides).length > 0) {
+                                layers[j].overrides = overrides;
+                            }
+                        }
+                        break;
+                    default:
+                }
+            }
+        }
+    }
+
+    polyglot.current_locale = selected_locale;
+    polyglot.saveConfigFile();
+    return true
+}
