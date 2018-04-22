@@ -94,7 +94,7 @@ export default class Polyglot {
         )
     }
 
-    saveConfigFile(localeContext) {
+    saveConfigFile() {
         return saveFile(
             this.config_file_path,
             this.current_locale,

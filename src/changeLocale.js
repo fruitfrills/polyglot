@@ -72,8 +72,8 @@ export default function changeLocale(context) {
         if (newLocaleName) {
             polyglot.current_locale = newLocaleName;
             polyglot.saveConfigFile();
-            const textLayersContent = getContent(context);
-            if (polyglot.saveLocaleToFile(textLayersContent)) {
+            const content = getContent(context.document.pages());
+            if (polyglot.saveLocaleToFile(content)) {
                 context.document.showMessage(`'${polyglot.current_locale}'  locale created.`);
                 window.orderOut(undefined);
                 NSApp.stopModal();
