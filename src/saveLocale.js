@@ -2,7 +2,7 @@ import {getContent} from './content';
 import Polyglot from './context';
 
 // create new locale
-function getNewLocaleByUser() {
+export function getNewLocaleByUser() {
     const accessory = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 300, 50));
     const input = NSTextField.alloc().initWithFrame(NSMakeRect(0, 25, 300, 25));
     input.editable = true;

@@ -1,4 +1,4 @@
-import saveLocale, {saveConfigFile, saveLocaleToFile} from './saveLocale';
+import saveLocale, {getNewLocaleByUser} from './saveLocale';
 import Polyglot from './context';
 import {getContent, setContent} from './content';
 
