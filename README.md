@@ -7,12 +7,12 @@ _This plugin was created using `skpm` and based on [text translate](https://gith
 
 ## Install
 
-[Download](https://github.com/fruitfrills/polyglot/releases/download/v0.2.0/plugin.sketchplugin.zip`)
+[Download](https://github.com/fruitfrills/polyglot/releases/download/v0.2.0/plugin.sketchplugin.zip)
 
 ## Usage
 
-Go to Plugins -> Texts Translation -> Save locale to save current locale.
-Go to Plugins -> Texts Translation -> Change locale to create new locale or change to an existing one.
+Go to Plugins -> Polyglot -> Save locale to save current locale.
+Go to Plugins -> Polyglot -> Change locale to create new locale or change to an existing one.
 
 ## Important
 You need to have a saved Sketch document before using the plugin. Locales files are saved in same folder ('Sketch document name'+'_polyglot').
