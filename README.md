@@ -1,4 +1,5 @@
 # polyglot
+![Polyglot demo](https://raw.githubusercontent.com/fruitfrills/polyglot/master/assets/polyglot.gif)
 
 Manage texts in Sketch in multiple locales.
 
