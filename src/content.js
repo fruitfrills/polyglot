@@ -9,7 +9,7 @@ const processOverrides = function (override, possibleTextfields) {
         let value = override[key];
         if ((value.class() + "").indexOf("String") !== -1) {
             if (possibleTextfields[key]) {
-                returnValue[key] = escape(value)
+                returnValue[key] = unescape(value)
             }
         } else if (value) {
             value = processOverrides(value, possibleTextfields);
@@ -61,15 +61,15 @@ const parseArtboard = function (artboard, symbolTextLayer) {
         switch (layer.class()) {
 
             case MSTextLayer:
-                value = escape(layer.stringValue());
+                value = unescape(layer.stringValue());
                 if (String(value) !== "") {
-                    content.texts[escape(layer.objectID())] = value;
+                    content.texts[unescape(layer.objectID())] = value;
                 }
                 break;
             case MSSymbolInstance:
                 value = processOverrides(layer.overrides(), symbolTextLayer);
                 if (Object.getOwnPropertyNames(value).length > 0) {
-                    content.texts[escape(layer.objectID())] = value;
+                    content.texts[unescape(layer.objectID())] = value;
                 }
                 break
         }
@@ -93,7 +93,7 @@ export const getContent = function (pages) {
         for (let j = 0; j < layers.length; j++) {
             const layer = layers[j];
             if (layer.class() === MSTextLayer) {
-                const key_string = escape(layer.objectID());
+                const key_string = unescape(layer.objectID());
                 symbolTextLayer[key_string] = true
             }
         }
@@ -151,13 +151,13 @@ export const setContent = (pages, polyglot, selected_locale) => {
                 let key_string;
                 switch (layers[j].class()) {
                     case MSTextLayer:
-                        key_string = escape(layers[j].objectID());
+                        key_string = unescape(layers[j].objectID());
                         if (localeText[key_string]) {
                             layers[j].setStringValue(localeText[key_string])
                         }
                         break;
                     case MSSymbolInstance:
-                        key_string = escape(layers[j].objectID());
+                        key_string = unescape(layers[j].objectID());
                         const value = localeText[key_string];
                         if (value) {
                             const overrides = fillOverride(layers[j].overrides(), value);
