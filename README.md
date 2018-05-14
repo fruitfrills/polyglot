@@ -7,7 +7,7 @@ _This plugin was created using `skpm` and based on [text translate](https://gith
 
 ## Install
 
-[Download](https://github.com/fruitfrills/polyglot/releases/download/v0.2.0/plugin.sketchplugin.zip)
+[Download](https://github.com/fruitfrills/polyglot/releases/download/v0.3.0/plugin.sketchplugin.zip)
 
 ## Usage
 
